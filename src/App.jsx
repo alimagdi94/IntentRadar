@@ -3,60 +3,53 @@ import './App.css';
 
 function App() {
   const [keyword, setKeyword] = useState('');
-  const [platform, setPlatform] = useState('reddit'); // 'reddit' or 'facebook'
+  const [platform, setPlatform] = useState('reddit'); // Default platform
   const [language, setLanguage] = useState('both'); // 'en', 'ar', 'both'
 
-  // Predefined monetization keywords for Egyptian/Arabic market + English
-  const queries = {
-    reddit: {
-      en: [
-        `site:reddit.com "${keyword}" "hiring"`,
-        `site:reddit.com "${keyword}" "looking for"`,
-        `site:reddit.com "${keyword}" "need help with"`,
-        `site:reddit.com "${keyword}" "willing to pay"`,
-      ],
-      ar: [
-        `site:reddit.com "${keyword}" "محتاج"`,
-        `site:reddit.com "${keyword}" "عايز"`,
-        `site:reddit.com "${keyword}" "حد يعرف"`,
-        `site:reddit.com "${keyword}" "فري لانس"`,
-      ]
-    },
-    facebook: {
-      en: [
-        `site:facebook.com "${keyword}" "hiring"`,
-        `site:facebook.com "${keyword}" "looking for"`,
-        `site:facebook.com "${keyword}" "paid"`,
-      ],
-      ar: [
-        `site:facebook.com "${keyword}" "محتاج"`,
-        `site:facebook.com "${keyword}" "عايز"`,
-        `site:facebook.com "${keyword}" "مطلوب"`,
-        `site:facebook.com "${keyword}" "حد يعرف"`,
-        `site:facebook.com "${keyword}" "ترشيح"`,
-        `site:facebook.com "${keyword}" "حد جرب"`,
-      ]
-    }
+  const platforms = [
+    { id: 'reddit', name: 'Reddit', site: 'reddit.com' },
+    { id: 'facebook', name: 'Facebook', site: 'facebook.com' },
+    { id: 'twitter', name: 'Twitter / X', site: 'twitter.com OR site:x.com' },
+    { id: 'linkedin', name: 'LinkedIn', site: 'linkedin.com' },
+    { id: 'quora', name: 'Quora', site: 'quora.com' },
+  ];
+
+  // Smart high-intent keywords (General urgency & Need focused)
+  const intents = {
+    en: [
+      "urgently need", "looking for", "where to find", "willing to pay",
+      "recommendations needed", "does anyone know", "best place for",
+      "ISO", "urgent", "need a pro", "looking to buy", "immediately", "ASAP"
+    ],
+    ar: [
+      "محتاج ضروري", "عايز", "حد يعرف", "منين اجيب",
+      "ترشيح", "مطلوب حالاً", "حد جرب", "مستعجل",
+      "ادفع كام", "افضل مكان", "ضروري جدا", "في اسرع وقت", "ألاقي فين"
+    ]
   };
 
   const getLinks = () => {
     if (!keyword.trim()) return [];
 
     let links = [];
-    const p = platform;
+    const selectedPlatformData = platforms.find(p => p.id === platform);
+    const domainQuery = `site:${selectedPlatformData.site}`;
 
     // Helper to add google search link
-    const addLink = (q, label) => ({
-      query: q,
-      label: label,
-      url: `https://www.google.com/search?q=${encodeURIComponent(q)}`
-    });
+    const addLink = (intent, label) => {
+      const q = `${domainQuery} "${keyword}" "${intent}"`;
+      return {
+        query: q,
+        label: label,
+        url: `https://www.google.com/search?q=${encodeURIComponent(q)}`
+      };
+    };
 
     if (language === 'en' || language === 'both') {
-      queries[p].en.forEach(q => links.push(addLink(q, 'English Dork')));
+      intents.en.forEach(intent => links.push(addLink(intent, 'English Dork')));
     }
     if (language === 'ar' || language === 'both') {
-      queries[p].ar.forEach(q => links.push(addLink(q, 'Arabic/Egyptian Dork')));
+      intents.ar.forEach(intent => links.push(addLink(intent, 'Arabic Dork')));
     }
 
     return links;
@@ -67,22 +60,19 @@ function App() {
   return (
     <div className="app-container">
       <div className="glass-card">
-        <h1 className="title">Support Dorker</h1>
-        <p className="subtitle">Find monetizable opportunities on Social Media</p>
+        <h1 className="title">IntentRadar</h1>
+        <p className="subtitle">Find urgent needs & opportunities on Social Media</p>
 
-        <div className="tabs">
-          <button
-            className={`tab ${platform === 'reddit' ? 'active' : ''}`}
-            onClick={() => setPlatform('reddit')}
-          >
-            Reddit
-          </button>
-          <button
-            className={`tab ${platform === 'facebook' ? 'active' : ''}`}
-            onClick={() => setPlatform('facebook')}
-          >
-            Facebook
-          </button>
+        <div className="tabs platform-tabs">
+          {platforms.map(p => (
+            <button
+              key={p.id}
+              className={`tab ${platform === p.id ? 'active' : ''}`}
+              onClick={() => setPlatform(p.id)}
+            >
+              {p.name}
+            </button>
+          ))}
         </div>
 
         <div className="input-group">
