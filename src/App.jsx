@@ -9,9 +9,6 @@ function App() {
   const platforms = [
     { id: 'reddit', name: 'Reddit', site: 'reddit.com' },
     { id: 'facebook', name: 'Facebook', site: 'facebook.com' },
-    { id: 'twitter', name: 'Twitter / X', site: 'twitter.com OR site:x.com' },
-    { id: 'linkedin', name: 'LinkedIn', site: 'linkedin.com' },
-    { id: 'quora', name: 'Quora', site: 'quora.com' },
   ];
 
   // Smart high-intent keywords (General urgency & Need focused)
